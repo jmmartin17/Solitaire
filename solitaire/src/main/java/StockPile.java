@@ -1,5 +1,5 @@
  
-public class ToDraw extends CardStack {
+public class StockPile extends CardStack {
 
 	public void setCoords() {
 		peek().setX(30);

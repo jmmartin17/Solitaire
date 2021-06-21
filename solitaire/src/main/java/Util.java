@@ -3,20 +3,20 @@ public class Util {
 	public static Card[][] cardMap = new Card[95][80];
 	public static CardStack[][] stackMap = new CardStack[95][80];
 
-public static final Ranks[] rankHash = { Ranks.ace, Ranks.two, Ranks.three, Ranks.four, Ranks.five, Ranks.six, Ranks.seven, Ranks.eight, Ranks.nine, Ranks.ten, Ranks.jack, Ranks.queen, Ranks.king };
+public static final Ranks[] rankLookup = { Ranks.ace, Ranks.two, Ranks.three, Ranks.four, Ranks.five, Ranks.six, Ranks.seven, Ranks.eight, Ranks.nine, Ranks.ten, Ranks.jack, Ranks.queen, Ranks.king };
 
-public static final Suits[] suitHash = { Suits.clubs, Suits.hearts, Suits.diamonds, Suits.spades };
+public static final Suits[] suitLookup = { Suits.clubs, Suits.hearts, Suits.diamonds, Suits.spades };
 
 public static int equateRank(Ranks rank) {
-	for(int i = 0; i < rankHash.length; i++)
-		if (rankHash[i] == rank)
+	for(int i = 0; i < rankLookup.length; i++)
+		if (rankLookup[i] == rank)
 			return i;
 	return -1;
 }
 
 public static int equateSuit(Suits suit) {
-	for(int i = 0; i < suitHash.length; i++)
-		if (suitHash[i] == suit)
+	for(int i = 0; i < suitLookup.length; i++)
+		if (suitLookup[i] == suit)
 			return i;
 	return -1;
 }
@@ -198,8 +198,8 @@ public static MainStack toMainStack(CardStack c) {
 	return m;
 }
 
-public static ToDraw toToDraw(CardStack c) {
-	ToDraw t = new ToDraw();
+public static StockPile toStockPile(CardStack c) {
+	StockPile t = new StockPile();
 	for(int i = 0; i < c.size(); i++)
 		t.push(c.get(i));
 	return t;

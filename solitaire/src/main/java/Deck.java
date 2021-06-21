@@ -1,13 +1,13 @@
- import java.util.*;
+import java.util.*;
 
 public class Deck {
-	private CardStack cards;
+	private final CardStack cards;
 
 	public Deck() {
 		cards = new CardStack();
-		for (int i = 0; i < Util.rankHash.length; i++)
-			for (int j = 0; j < Util.suitHash.length; j++)
-				cards.push(new Card(Util.rankHash[i], Util.suitHash[j]));
+		for (int i = 0; i < Util.rankLookup.length; i++)
+			for (int j = 0; j < Util.suitLookup.length; j++)
+				cards.push(new Card(Util.rankLookup[i], Util.suitLookup[j]));
 	}
 
 	public void shuffle() {

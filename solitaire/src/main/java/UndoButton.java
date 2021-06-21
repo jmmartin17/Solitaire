@@ -7,9 +7,21 @@ public class UndoButton extends JButton {
 
 	public UndoButton(String text) {
 		super(text);
-		gameStates = new Stack<GameState>();
-		addActionListener(new Undo());
+    reset();
 	}
+  
+  public final void reset() {
+		gameStates = new Stack<>();
+  }
+  
+  public final void start() {
+    if (getActionListeners().length < 1)
+		  addActionListener(new Undo());
+  }
+  
+  public void stop() {
+		removeActionListener(getActionListeners()[0]);
+  }
 
 	public void newState() {
 		gameStates.push(new GameState(Solitaire.game.getHomeStacks(),
@@ -22,6 +34,7 @@ public class UndoButton extends JButton {
 		public Undo() {
 		}
 
+    @Override
 		public void actionPerformed(ActionEvent arg0) {
 			if (!gameStates.empty())
 				gameStates.pop().implementStates(Solitaire.game);

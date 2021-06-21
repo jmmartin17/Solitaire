@@ -1,11 +1,12 @@
- import javax.swing.*;
+import javax.swing.*;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 
 public class MainPanel extends JPanel {
+  // members
 	private Deck deck;
-	private ToDraw toDraw;
+	private StockPile toDraw;
 	private Drawn drawn;
 	private ArrayList<CardStack> allStacks;
 	private ArrayList<MainStack> mainStacks;
@@ -18,12 +19,23 @@ public class MainPanel extends JPanel {
 	public MainPanel() {
 		setPreferredSize(new Dimension(950, 660));
 		System.out.println("//");
-		game = true;
+    restartGame();
+	}
+  
+  public final void restartGame()
+  {
+    game = true;
 		deck = new Deck();
 		deck.shuffle();
-		mainStacks = new ArrayList<MainStack>();
-		allStacks = new ArrayList<CardStack>();
-		homeStacks = new ArrayList<HomeStack>();
+		mainStacks = new ArrayList<>();
+		allStacks  = new ArrayList<>();
+		homeStacks = new ArrayList<>();
+    
+    if (timer != null) {
+      timer.stop();
+      timer = null;
+    }
+    
 		for (int i = 0; i < 7; i++) {
 			MainStack temp = Util.toMainStack(deck.draw(i + 1));
 			temp.setIndex(i);
@@ -41,17 +53,23 @@ public class MainPanel extends JPanel {
 			homeStacks.get(i).populate();
 			allStacks.add(homeStacks.get(i));
 		}
-		toDraw = Util.toToDraw(deck.draw(52 - 28));
+		toDraw = Util.toStockPile(deck.draw(52 - 28));
 		allStacks.add(toDraw);
 		drawn = new Drawn();
 		allStacks.add(drawn);
 		setBackground(new Color(20, 100, 20));
+    while (getMouseListeners().length > 0)
+      removeMouseListener(getMouseListeners()[0]);
+    while (getMouseMotionListeners().length > 0)
+      removeMouseMotionListener(getMouseMotionListeners()[0]);
 		click = new Click();
 		addMouseListener(click);
 		drag = new Drag();
 		addMouseMotionListener(drag);
+    Solitaire.undoButton.start();
+    Solitaire.resetButton.start();
 		repaint();
-	}
+  }
 
 	private class Click implements MouseListener {
 		private ArrayList<Card> held;
@@ -60,7 +78,8 @@ public class MainPanel extends JPanel {
 
 		public Click() {
 		}
-
+    
+    @Override
 		public void mouseClicked(MouseEvent e) {
 			if (e.getButton() == MouseEvent.BUTTON3) {
 				returnHome();
@@ -69,27 +88,19 @@ public class MainPanel extends JPanel {
 			}
 			if (e.getX() >= 30 && e.getX() <= 130 && e.getY() >= 30
 					&& e.getY() <= 210) {
-				Solitaire.button.newState();
+				Solitaire.undoButton.newState();
 				nextCard();
 			}
 			repaint();
 		}
 
-		public void mouseEntered(MouseEvent e) {
-
-		}
-
-		public void mouseExited(MouseEvent e) {
-			// TODO Auto-generated method stub
-
-		}
-
+    @Override
 		public void mousePressed(MouseEvent e) {
 			Card clicked = Util.cardMap[e.getX() / 10][e.getY() / 10];
 			if (clicked == null || !clicked.faceUp())
 				return;
 			source = clicked.getContainer();
-			held = new ArrayList<Card>();
+			held = new ArrayList<>();
 			for (int i = find(clicked, source); i < source.size(); i++)
 				held.add(source.get(i));
 			for (int i = 0; i < held.size(); i++)
@@ -98,6 +109,7 @@ public class MainPanel extends JPanel {
 			y = e.getY() - clicked.getY();
 		}
 
+    @Override
 		public void mouseReleased(MouseEvent e) {
 			if (held != null) {
 				boolean validRelease;
@@ -110,7 +122,7 @@ public class MainPanel extends JPanel {
 							held.get(0));
 				if (validRelease) {
 					append(source, held);
-					Solitaire.button.newState();
+					Solitaire.undoButton.newState();
 					for (int i = 0; i < held.size(); i++) {
 						source.pop();
 						destination.push(held.get(i));
@@ -126,6 +138,11 @@ public class MainPanel extends JPanel {
 			}
 			repaint();
 		}
+    
+    @Override
+    public void mouseExited(MouseEvent e) {}
+    @Override
+    public void mouseEntered(MouseEvent e) {}
 
 		public ArrayList<Card> getHeld() {
 			return held;
@@ -143,12 +160,14 @@ public class MainPanel extends JPanel {
 	private class Drag implements MouseMotionListener {
 		private int x, y;
 
+    @Override
 		public void mouseDragged(MouseEvent e) {
 			x = e.getX();
 			y = e.getY();
 			repaint();
 		}
 
+    @Override
 		public void mouseMoved(MouseEvent arg0) {
 		}
 
@@ -169,13 +188,14 @@ public class MainPanel extends JPanel {
 			on = false;
 		}
 		
+    @Override
 		public void actionPerformed(ActionEvent arg0) {
-			on = !on;
-			if (on)
-				drawWin(getGraphics());
-			else
-				repaint();
-		}
+  	on = !on;
+  	if (on)
+  		drawWin(getGraphics());
+      else
+      	repaint();
+    }
 	}
 
 	private void nextCard() {
@@ -207,7 +227,7 @@ public class MainPanel extends JPanel {
 				for (int j = 0; j < homeStacks.size(); j++)
 					if (homeStacks.get(j).validPlacement(
 							homeStacks.get(j).peek(), mainStacks.get(i).peek())) {
-						Solitaire.button.newState();
+						Solitaire.undoButton.newState();
 						homeStacks.get(j).push(mainStacks.get(i).pop());
 						if (!mainStacks.get(i).empty()) {
 							mainStacks.get(i).peek().flip();
@@ -218,13 +238,14 @@ public class MainPanel extends JPanel {
 				if (!drawn.empty()
 						&& homeStacks.get(j).validPlacement(
 								homeStacks.get(j).peek(), drawn.peek())) {
-					Solitaire.button.newState();
+					Solitaire.undoButton.newState();
 					homeStacks.get(j).push(drawn.pop());
 					break;
 				}
 		}
 	}
 
+  @Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		for (int i = 0; i < 95; i++)
@@ -260,7 +281,7 @@ public class MainPanel extends JPanel {
 		timer.start();
 		removeMouseListener(click);
 		removeMouseMotionListener(drag);
-		Solitaire.button.removeActionListener(Solitaire.button.getActionListeners()[0]);
+    Solitaire.undoButton.stop();
 		game = false;
 	}
 
@@ -270,12 +291,12 @@ public class MainPanel extends JPanel {
 	}
 	
 	public void setStates(ArrayList<HomeStack> h, ArrayList<MainStack> m, Drawn d,
-			ToDraw t) {
+			StockPile t) {
 		homeStacks = h;
 		mainStacks = m;
 		drawn = d;
 		toDraw = t;
-		allStacks = new ArrayList<CardStack>();
+		allStacks = new ArrayList<>();
 		for(int i = 0; i < homeStacks.size(); i++)
 			allStacks.add(homeStacks.get(i));
 		for(int i = 0; i < mainStacks.size(); i++)
@@ -297,7 +318,7 @@ public class MainPanel extends JPanel {
 		return drawn;
 	}
 	
-	public ToDraw getToDraw() {
+	public StockPile getToDraw() {
 		return toDraw;
 	}
 	
