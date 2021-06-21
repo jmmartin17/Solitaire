@@ -227,7 +227,7 @@ public class MainPanel extends JPanel {
 			if (clicked == null || !clicked.faceUp())
 				return;
 			source = clicked.getContainer();
-			held = new CardStack();
+			held = new MainStack();
 			for (int i = find(clicked, source); i < source.size(); i++)
 				held.add(source.get(i));
 			for (int i = 0; i < held.size(); i++)

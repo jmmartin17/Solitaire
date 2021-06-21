@@ -16,11 +16,7 @@ public class MainStack extends CardStack {
 		if (base == null)
 			return toPlace.getRank() == Ranks.king;
 		return toPlace.compareTo(base) == 1
-				&& xor(base.isRed(), toPlace.isRed());
-	}
-	
-	private boolean xor(boolean b1, boolean b2) {
-		return (b1 && !b2) || (!b1 && b2);
+				&& Util.xor(base.isRed(), toPlace.isRed());
 	}
 	
 	public void draw(java.awt.Graphics g) {

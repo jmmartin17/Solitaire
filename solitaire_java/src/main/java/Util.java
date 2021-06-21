@@ -21,6 +21,10 @@ public static int equateSuit(Suits suit) {
 	return -1;
 }
 
+public static boolean xor(boolean b1, boolean b2) {
+		return (b1 && !b2) || (!b1 && b2);
+	}
+
 public static final byte[][][] rankBitmaps = 	{
 							{ 
 								{ 0, 0, 0, 1, 0, 0, 0 },
