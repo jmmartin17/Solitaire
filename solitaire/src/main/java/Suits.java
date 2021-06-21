@@ -1,1 +1,0 @@
- public enum Suits { clubs, hearts, diamonds, spades }
