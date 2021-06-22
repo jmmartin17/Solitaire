@@ -36,4 +36,22 @@ class CardStack extends Array {
     for (c in cs)
       this.push(c);
   }
+
+  toMainStack() {
+    ret = new MainStack();
+    for (c in this) { 
+      ret.push(c);
+    }
+
+    return ret;
+  }
+  
+  toStockPile() {
+    ret = new StockPile();
+    for (c in this) { 
+      ret.push(c);
+    }
+
+    return ret;
+  }
 }
